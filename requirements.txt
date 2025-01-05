@@ -1,0 +1,4 @@
+﻿undetected-chromedriver~=3.5.5
+selenium~=4.27.1
+PrettyColorPrinter~=0.45
+python-dotenv~=1.0.1
