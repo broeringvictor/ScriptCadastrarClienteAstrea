@@ -17,7 +17,15 @@ class AstreaDocumentation:
         self.driver_license = ""
         self.passport = ""
 
-    def verificar_e_navegar_para_url(self):
+    def set_data_from_client(self, client):
+        self.cpf = client.cpf
+        self.rg = client.rg
+        self.ctps = client.ctps
+        self.benefit_document = client.benefit_document
+        self.voter_document = client.voter_document
+        self.driver_license = client.driver_license
+        self.passport = client.passport
+    def verificar_e_navegar_para_url(self, extra_delay=5):
         """
         Verifica a URL atual e navega para a URL específica se necessário.
         """
@@ -35,6 +43,10 @@ class AstreaDocumentation:
                 print("Navegou para a URL desejada com sucesso.")
             else:
                 print("Já está na URL desejada.")
+
+            if extra_delay:
+                print(f"Extra_delay --> Aguardando {extra_delay} segundos...")
+                time.sleep(extra_delay)
 
         except Exception as e:
             print(f"Erro ao verificar ou navegar para a URL: {e}")
@@ -87,10 +99,10 @@ class AstreaDocumentation:
         except Exception as e:
             print(f"Erro ao preencher o formulário: {e}")
 
-        def enviar_formulario(self):
+    def enviar_formulario(self):
             """Função para enviar o formulário clicando no botão de envio."""
             try:
-                print("Tentando localizar o botão de envio do formulário...")
+                input("Revise os dados no formulário e pressione ENTER para enviá-lo...")
 
                 # Aguarda até que o botão esteja presente e clicável
                 button = WebDriverWait(self.driver, 15).until(
@@ -102,8 +114,7 @@ class AstreaDocumentation:
                     ))
                 )
 
-                # Realiza o clique no botão de envio
-                print("Botão localizado. Preparando para clicar...")
+
                 ActionChains(self.driver).move_to_element(button).click(button).perform()
                 print("Formulário enviado com sucesso!")
 

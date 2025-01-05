@@ -1,4 +1,6 @@
-﻿from selenium.webdriver.common.by import By
+﻿import time
+
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -17,7 +19,16 @@ class AstreaAdditional:
         self.birth_year = ""  # Ano de nascimento
         self.homeland = ""  # Naturalidade
 
-    def verificar_e_navegar_para_url(self):
+    def set_data_from_client(self, client):
+        self.job = client.job
+        self.economic_activity_code = client.economic_activity_code
+        self.marital_status = client.marital_status
+        self.birth_day = client.birth_day
+        self.birth_month = client.birth_month
+        self.birth_year = client.birth_year
+        self.homeland = client.homeland
+
+    def verificar_e_navegar_para_url(self, extra_delay=5):
         """
         Verifica a URL atual e navega para a URL específica se necessário.
         """
@@ -33,6 +44,10 @@ class AstreaAdditional:
                 print(f"URL diferente da esperada. Navegando para {url_desejada}...")
                 self.driver.get(url_desejada)  # Navega até a URL desejada
                 print("Navegou para a URL desejada com sucesso.")
+
+                if extra_delay:
+                    print(f"Extra_delay --> Aguardando {extra_delay} segundos...")
+                    time.sleep(extra_delay)
             else:
                 print("Já está na URL desejada.")
 
@@ -55,15 +70,17 @@ class AstreaAdditional:
                 "selector": "//*[@id='mainDiv']/div[2]/div/div/main/div/div/div/div[4]/div/div/div[1]/div/div/div[1]/div/div[2]/div/div/select",
                 "name": "birth_month", "type": "select", "value": self.birth_month},
             {
-                "selector": "//*[@id='mainDiv']/div[2]/div/div/main/div/div/div/div[4]/div/div/div[1]/div/div/div[1]/div/div[3]/div/div/select",
+                "selector":'//*[@id="mainDiv"]/div[2]/div/div/main/div/div/div/div[4]/div/div/div[1]/div/div/div[1]/div/div[3]/div/div/select',
                 "name": "birth_year", "type": "select", "value": self.birth_year},
-            {"selector": "#contactHomeland", "name": "homeland", "type": "select", "value": self.homeland}
+            {"selector": "input#contactHomeland", "name": "homeland", "type": "text", "value": self.homeland}
         ]
 
     def preencher_formulario(self):
         """Preenche os campos de texto e seleções mapeados."""
         try:
             print("Aguarde enquanto os campos estão carregando...")
+
+
 
             # Aguarda o elemento principal do formulário carregar (utilizando o seletor do primeiro campo)
             WebDriverWait(self.driver, 20).until(
