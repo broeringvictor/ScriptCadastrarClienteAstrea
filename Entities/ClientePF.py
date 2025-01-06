@@ -1,4 +1,4 @@
-﻿class ClientePessoaFisica:
+﻿class ClientePF:
     def __init__(self,
                  id: str,
                  contact_name: str,
@@ -92,7 +92,7 @@
 
 if __name__ == "__main__":
     # Exemplo do método __str__ em ação:
-    cliente = ClientePessoaFisica(
+    cliente = ClientePF(
         id=1,
         contact_name="João Silva",
         contact_nickname="João",

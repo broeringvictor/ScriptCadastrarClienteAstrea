@@ -1,6 +1,6 @@
 ﻿import pymysql
 import Data.ConnectionMySql as MySql
-from Entities.ClientePF import ClientePessoaFisica  # Importa a classe do cliente
+from Entities.ClientePF import ClientePF  # Importa a classe do cliente
 
 
 class BuscarClientesPF:
@@ -35,7 +35,7 @@ class BuscarClientesPF:
 
             # Converte cada resultado em um objeto ClientePessoaFisica
             clientes = [
-                ClientePessoaFisica(
+                ClientePF(
                     id=cliente["Id"],
                     contact_name=cliente["ContactName"],
                     contact_nickname=cliente["ContactNickname"],

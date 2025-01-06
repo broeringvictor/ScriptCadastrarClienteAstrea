@@ -1,12 +1,22 @@
-from UseCases.AdicionarContato import AstreaDocumentation
-from Shared.LoginAstrea import LoginAstrea
+import os
+import sys
+import time
 from selenium.webdriver.chrome.options import Options
 import undetected_chromedriver as uc
-import time
+
+# Garantir que o caminho raiz do projeto esteja no sys.path
+base_path = os.path.dirname(os.path.abspath(__file__))  # Caminho absoluto do arquivo main.py
+sys.path.append(base_path)
+base_path = os.path.dirname(os.path.abspath(__file__))  # Caminho absoluto do main.py
+root_path = os.path.dirname(base_path)  # Caminho raiz do projeto
+sys.path.append(root_path)
+
+from Shared.LoginAstrea import LoginAstrea
 from UseCases.BuscarContato.BuscarClientesPF import BuscarClientesPF
-from UseCases.AdicionarContato.AstreaAdditional import AstreaAdditional
 from UseCases.AdicionarContato.AstreaPersonal import AstreaPersonal
 from UseCases.AdicionarContato.AstreaDocumentation import AstreaDocumentation
+from UseCases.AdicionarContato.AstreaAdditional import AstreaAdditional
+
 
 
 def main():
@@ -78,4 +88,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Erro durante a execução: {e}")
+        import traceback
+
+        traceback.print_exc()
+    input("Pressione ENTER para sair...")
