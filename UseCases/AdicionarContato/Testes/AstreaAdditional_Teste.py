@@ -1,8 +1,8 @@
-﻿from AdicionarContato.AstreaAdditional import AstreaAdditional  # Certifique-se de que esta classe foi salva corretamente
+﻿from UseCases.AdicionarContato.AstreaAdditional import AstreaAdditional  # Certifique-se de que esta classe foi salva corretamente
 
 # Script Principal de Teste
 try:
-    from AdicionarContato.LoginAstrea import LoginAstrea  # Classe responsável pelo login
+    from Shared.LoginAstrea import LoginAstrea  # Classe responsável pelo login
 
     # Inicializa o WebDriver e realiza o login
     login_astrea = LoginAstrea()  # Certifique-se de que a classe LoginAstrea já inicializa corretamente o driver Selenium

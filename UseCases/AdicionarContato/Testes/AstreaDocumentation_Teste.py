@@ -1,5 +1,5 @@
-﻿from AdicionarContato.AstreaDocumentation import AstreaDocumentation
-from AdicionarContato.LoginAstrea import LoginAstrea
+﻿from UseCases.AdicionarContato.AstreaDocumentation import AstreaDocumentation
+from Shared.LoginAstrea import LoginAstrea
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC

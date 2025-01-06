@@ -1,98 +1,81 @@
-from AdicionarContato.AstreaDocumentation import AstreaDocumentation
-from AdicionarContato.LoginAstrea import LoginAstrea
-from AdicionarContato.AstreaAdditional import AstreaAdditional
-from AdicionarContato.AstreaPersonal import AstreaPersonal
-from AdicionarContato.AstreaNewClient import AstreaNewClient
+from UseCases.AdicionarContato import AstreaDocumentation
+from Shared.LoginAstrea import LoginAstrea
 from selenium.webdriver.chrome.options import Options
 import undetected_chromedriver as uc
+import time
+from UseCases.BuscarContato.BuscarClientesPF import BuscarClientesPF
+from UseCases.AdicionarContato.AstreaAdditional import AstreaAdditional
+from UseCases.AdicionarContato.AstreaPersonal import AstreaPersonal
+from UseCases.AdicionarContato.AstreaDocumentation import AstreaDocumentation
 
-# Configurar o modo headless
-options = Options()
-#options.add_argument("--headless")
-options.add_argument("--disable-gpu")  # Opcional, melhora a compatibilidade
-options.add_argument("--no-sandbox")  # Recomendado para servidores Linux
-options.add_argument("--disable-dev-shm-usage")  # Evita problemas de memória
 
-# Iniciar o navegador com as opções configuradas
-driver = uc.Chrome(options=options)
-base_url = r"https://astrea.net.br/#/main/contacts/add-edit-merge/%5B,,false,%5B%5D,%5D/personal"
+def main():
+    # Configurar as opções do Chrome
+    options = Options()
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    # Descomente para o modo "headless" se necessário
+    # options.add_argument("--headless")
 
-# Dados do cliente centralizados em uma instância da classe AstreaNewClient
-novo_cliente = AstreaNewClient(
-    # Dados pessoais
-    contact_name="João Silva",
-    contact_nickname="João",
-    phone="48991668808",
-
-    email="joaosilva@email.com",
-    website="www.joaosilva.com",
-
-    zip_code="12345-678",
-    street="Rua das Flores",
-    number="123",
-    neighborhood="Centro",
-    complement="Apto. 45",
-    city="São Paulo",
-    state="SP",
-    country="Brasil",
-    # Dados adicionais
-    job="Analista de Sistemas",
-    economic_activity_code="6201-5/01",
-    marital_status="Solteiro",
-    birth_day="15",
-    birth_month="Junho",
-    birth_year="1990",
-    homeland="Brasil",
-    # Documentos
-    cpf="123.456.789-10",
-    rg="12.345.678-9",
-    ctps="12345678",
-    benefit_document="345678910",
-    voter_document="123456789123",
-    driver_license="AB123456",
-    passport="AB12345678"
-)
-
-# Fluxo principal para preencher os formulários no Astrea
-try:
-    # Login
-    login_astrea = LoginAstrea(driver=driver, base_url=base_url)
-    login_astrea.login()
-    print("Login realizado com sucesso.")
-
-    # Preenchimento da seção "Pessoal"
     try:
-        astrea_personal = AstreaPersonal(driver)
-        astrea_personal.set_data_from_client(novo_cliente)  # Chamar o método para transferir os dados
-        astrea_personal.verificar_e_navegar_para_url(5)
-        astrea_personal.preencher_formulario()
-        print("Formulário 'Pessoal' preenchido com sucesso.")
-    except Exception as e:
-        print(f"Erro ao preencher o formulário 'Pessoal': {e}")
+        # Inicializar o driver com as opções corrigidas
+        driver = uc.Chrome(options=options, use_subprocess=True)
+        base_url = r"https://astrea.net.br/#/main/contacts/add-edit-merge/%5B,,false,%5B%5D,%5D/personal"
 
-    # Preenchimento da seção "Adicional"
-    try:
-        astrea_additional = AstreaAdditional(driver)
-        astrea_additional.set_data_from_client(novo_cliente)  # Passa os dados centralizados para o preenchimento
-        astrea_additional.verificar_e_navegar_para_url(5)
-        astrea_additional.preencher_formulario()
-        print("Formulário 'Adicional' preenchido com sucesso.")
-    except Exception as e:
-        print(f"Erro ao preencher o formulário 'Adicional': {e}")
+        # Passo 1: Selecionar um cliente no terminal
+        cliente_selecionado = BuscarClientesPF.selecionar_cliente()
 
-    # Preenchimento da seção "Documentação"
-    try:
-        astrea_documentation = AstreaDocumentation(driver)
-        astrea_documentation.set_data_from_client(novo_cliente)  # Passa os dados centralizados para o preenchimento
-        astrea_documentation.verificar_e_navegar_para_url(5)
-        astrea_documentation.preencher_formulario()
-        print("Formulário 'Documentação' preenchido com sucesso.")
-        astrea_documentation.enviar_formulario()
+        if not cliente_selecionado:
+            print("Nenhum cliente foi selecionado.")
+            return
+
+        print(f"\nCliente selecionado: {cliente_selecionado}")
+
+        # Passo 2: Realizar login
+        login_astrea = LoginAstrea(driver=driver, base_url=base_url)
+        login_astrea.login()
+        print("Login realizado com sucesso.")
+
+        # Passo 3: Preenchimento da seção Personal
+        personal_section = AstreaPersonal(driver)
+        personal_section.set_data_from_client(cliente_selecionado)
+
+        print("---------- Navegando para a seção 'Personal' ----------")
+        personal_section.verificar_e_navegar_para_url()
+        personal_section.preencher_formulario()
+
+        # Passo 4: Preenchimento da seção Additional
+        additional_section = AstreaAdditional(driver)
+        additional_section.set_data_from_client(cliente_selecionado)
+
+        print("Navegando para a seção 'Additional'...")
+        additional_section.verificar_e_navegar_para_url(extra_delay=5)
+        additional_section.preencher_formulario()
+
+        # Passo 5: Preenchimento da seção Documentation
+        documentation_section = AstreaDocumentation(driver)
+        documentation_section.set_data_from_client(cliente_selecionado)
+
+        print("Navegando para a seção 'Documentation'...")
+        documentation_section.verificar_e_navegar_para_url(extra_delay=5)
+        documentation_section.preencher_formulario()
+
+        # Passo 6: Revisar e enviar o formulário
+        documentation_section.enviar_formulario()
+        print("Formulário preenchido e enviado com sucesso!")
 
     except Exception as e:
-        print(f"Erro ao preencher o formulário 'Documentação': {e}")
+        print(f"Ocorreu um erro durante o processamento: {e}")
 
-except Exception as e:
-    print(f"Erro durante o processo principal: {e}")
+    finally:
+        # Encerrar o driver com segurança
+        try:
+            time.sleep(5)
+           # driver.quit()
+        except Exception as driver_error:
+            print(f"Erro ao encerrar o driver: {driver_error}")
 
 
+if __name__ == "__main__":
+    main()

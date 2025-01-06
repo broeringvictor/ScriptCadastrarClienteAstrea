@@ -1,8 +1,8 @@
 ﻿import time
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
+from datetime import date
 
 
 class AstreaAdditional:
@@ -10,9 +10,10 @@ class AstreaAdditional:
         """Inicializa com o driver do Selenium e define variáveis para os campos."""
         self.driver = driver
 
-        # Variáveis para valores que serão preenchidos no formulário
+
+        # Variáveis para valores que serão preenchidos no formulário.
         self.job = ""  # Profissão
-        self.economic_activity_code = ""  # Código da atividade econômica
+        self.company = ""  # Código da atividade econômica
         self.marital_status = ""  # Estado civil
         self.birth_day = ""  # Dia de nascimento
         self.birth_month = ""  # Mês de nascimento
@@ -20,13 +21,49 @@ class AstreaAdditional:
         self.homeland = ""  # Naturalidade
 
     def set_data_from_client(self, client):
+        """Configura os dados do cliente nos atributos do objeto."""
         self.job = client.job
-        self.economic_activity_code = client.economic_activity_code
+        self.company = client.company  # Corrigido para utilizar `client.company`
         self.marital_status = client.marital_status
-        self.birth_day = client.birth_day
-        self.birth_month = client.birth_month
-        self.birth_year = client.birth_year
         self.homeland = client.homeland
+
+        self.birth_day = client.birth_day
+        # Configurar os valores de nascimento
+        self.set_birth_date(client.birth_date)
+        client.birth_day = self.birth_day
+        client.birth_month = self.birth_month
+        client.birth_year = self.birth_year
+
+
+        # Configura a data de nascimento utilizando a função de conversão.
+
+    def set_birth_date(self, birth_date):
+        """
+        Converte uma data de nascimento do tipo datetime.date ou string no formato yyyy-mm-dd
+        para os atributos dia, mês e ano.
+
+        Args:
+            birth_date (date or str): Data de nascimento no formato datetime.date ou yyyy-mm-dd.
+        """
+        try:
+            if isinstance(birth_date, date):
+                # Caso a entrada já seja um objeto datetime.date
+                self.birth_year = str(birth_date.year)
+                self.birth_month = f"{birth_date.month:02}"  # Garantindo formato 2 dígitos
+                self.birth_day = f"{birth_date.day:02}"  # Garantindo formato 2 dígitos
+            elif isinstance(birth_date, str):
+                # Caso a entrada seja uma string
+                year, month, day = birth_date.split("-")
+                self.birth_year = year
+                self.birth_month = month
+                self.birth_day = day
+            else:
+                print(f"Tipo inválido para birth_date: {type(birth_date)}")
+                return
+
+            print(f"Data de nascimento convertida: Dia={self.birth_day}, Mês={self.birth_month}, Ano={self.birth_year}")
+        except Exception as e:
+            print(f"Erro ao processar a data de nascimento '{birth_date}': {e}")
 
     def verificar_e_navegar_para_url(self, extra_delay=5):
         """
@@ -46,7 +83,7 @@ class AstreaAdditional:
                 print("Navegou para a URL desejada com sucesso.")
 
                 if extra_delay:
-                    print(f"Extra_delay --> Aguardando {extra_delay} segundos...")
+                    print(f"Extra delay --> Aguardando {extra_delay} segundos...")
                     time.sleep(extra_delay)
             else:
                 print("Já está na URL desejada.")
@@ -59,8 +96,8 @@ class AstreaAdditional:
         """Realiza o mapeamento dos inputs e os associa às variáveis correspondentes."""
         return [
             {"selector": "input#contactJob", "name": "job", "type": "text", "value": self.job},
-            {"selector": "input#contactEconomicActivityCode", "name": "economic_activity_code", "type": "text",
-             "value": self.economic_activity_code},
+            {"selector": "#contactCompanyName", "name": "economic_activity_code", "type": "text",
+             "value": self.company},
             {"selector": "input#contactMaritalStatus", "name": "marital_status", "type": "text",
              "value": self.marital_status},
             {
@@ -70,7 +107,7 @@ class AstreaAdditional:
                 "selector": "//*[@id='mainDiv']/div[2]/div/div/main/div/div/div/div[4]/div/div/div[1]/div/div/div[1]/div/div[2]/div/div/select",
                 "name": "birth_month", "type": "select", "value": self.birth_month},
             {
-                "selector":'//*[@id="mainDiv"]/div[2]/div/div/main/div/div/div/div[4]/div/div/div[1]/div/div/div[1]/div/div[3]/div/div/select',
+                "selector": '//*[@id="mainDiv"]/div[2]/div/div/main/div/div/div/div[4]/div/div/div[1]/div/div/div[1]/div/div[3]/div/div/select',
                 "name": "birth_year", "type": "select", "value": self.birth_year},
             {"selector": "input#contactHomeland", "name": "homeland", "type": "text", "value": self.homeland}
         ]
@@ -78,15 +115,10 @@ class AstreaAdditional:
     def preencher_formulario(self):
         """Preenche os campos de texto e seleções mapeados."""
         try:
+            print("Data de nascimento processada antes de preencher o formulário.")
+
             print("Aguarde enquanto os campos estão carregando...")
 
-
-
-            # Aguarda o elemento principal do formulário carregar (utilizando o seletor do primeiro campo)
-            WebDriverWait(self.driver, 20).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "input#contactJob"))
-            )
-            print("Os campos do formulário foram carregados com sucesso.")
 
             # Itera pelos campos mapeados no método map_inputs
             for campo in self.map_inputs():
