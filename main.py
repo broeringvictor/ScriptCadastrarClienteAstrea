@@ -32,7 +32,7 @@ def main():
         # Inicializar o driver com as opções corrigidas
         driver = uc.Chrome(options=options, use_subprocess=True)
         base_url = r"https://astrea.net.br/#/main/contacts/add-edit-merge/%5B,,false,%5B%5D,%5D/personal"
-
+        extra_delay = 3
         # Passo 1: Selecionar um cliente no terminal
         cliente_selecionado = BuscarClientesPF.selecionar_cliente()
 
@@ -60,7 +60,7 @@ def main():
         additional_section.set_data_from_client(cliente_selecionado)
 
         print("Navegando para a seção 'Additional'...")
-        additional_section.verificar_e_navegar_para_url(extra_delay=5)
+        additional_section.verificar_e_navegar_para_url(extra_delay)
         additional_section.preencher_formulario()
 
         # Passo 5: Preenchimento da seção Documentation
@@ -68,7 +68,7 @@ def main():
         documentation_section.set_data_from_client(cliente_selecionado)
 
         print("Navegando para a seção 'Documentation'...")
-        documentation_section.verificar_e_navegar_para_url(extra_delay=5)
+        documentation_section.verificar_e_navegar_para_url(extra_delay)
         documentation_section.preencher_formulario()
 
         # Passo 6: Revisar e enviar o formulário

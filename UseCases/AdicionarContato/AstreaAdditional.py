@@ -49,17 +49,14 @@ class AstreaAdditional:
             if isinstance(birth_date, date):
                 # Caso a entrada já seja um objeto datetime.date
                 self.birth_year = str(birth_date.year)
-                self.birth_month = f"{birth_date.month:02}"  # Garantindo formato 2 dígitos
-                self.birth_day = f"{birth_date.day:02}"  # Garantindo formato 2 dígitos
+                self.birth_month = str(birth_date.month)  # Sem zero à esquerda
+                self.birth_day = str(birth_date.day)  # Sem zero à esquerda
             elif isinstance(birth_date, str):
                 # Caso a entrada seja uma string
                 year, month, day = birth_date.split("-")
                 self.birth_year = year
-                self.birth_month = month
-                self.birth_day = day
-            else:
-                print(f"Tipo inválido para birth_date: {type(birth_date)}")
-                return
+                self.birth_month = str(int(month))  # Remove zero à esquerda ao converter para int
+                self.birth_day = str(int(day))  # Remove zero à esquerda ao converter para int
 
             print(f"Data de nascimento convertida: Dia={self.birth_day}, Mês={self.birth_month}, Ano={self.birth_year}")
         except Exception as e:
@@ -138,7 +135,10 @@ class AstreaAdditional:
                             EC.presence_of_element_located((By.XPATH, campo["selector"]))
                         )
                         select = Select(elemento)
-                        select.select_by_visible_text(campo['value'])
+                        try:
+                            select.select_by_visible_text(campo['value'])
+                        except:
+                            select.select_by_index(str(campo['value']))
                         print(f"Campo de seleção '{campo['name']}' preenchido com: {campo['value']}")
                 except Exception as e:
                     print(f"Erro ao preencher o campo '{campo['name']}': {e}")

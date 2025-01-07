@@ -62,7 +62,7 @@ class AstreaPersonal:
             {"selector": "input[placeholder='Digite o país']", "name": "country", "type": "text", "value": self.country},
 
         ]
-    def verificar_e_navegar_para_url(self, extra_delay=5):
+    def verificar_e_navegar_para_url(self, extra_delay=2):
         """
         Verifica a URL atual e navega para a URL específica se necessário.
         """
